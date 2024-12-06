@@ -14,6 +14,28 @@ const puppeteer = require('puppeteer');
     // Optionally wait for a specific element to load
     await page.waitForSelector('.services-section', { timeout: 120000 });
 
+    // Wait for the button to appear
+    const buttonSelector = '#impersonate-button'; // Adjust the selector to match your button's ID
+    await page.waitForSelector(buttonSelector, { timeout: 120000 });
+
+    // Impersonate the EID by entering it and clicking the button
+    await page.evaluate(
+        (eid, selector) => {
+            const button = document.querySelector(selector);
+            if (button) {
+                const eidInput = document.querySelector('#eid-input'); // Adjust selector for EID input field
+                if (eidInput) {
+                    eidInput.value = eid; // Set the impersonated EID
+                    eidInput.dispatchEvent(new Event('input', { bubbles: true })); // Trigger input event
+                }
+                button.click(); // Click the impersonation button
+            }
+        },
+        impersonatedEid,
+        buttonSelector
+    );
+
+
     // Get the page's total height to adjust the scaling
     const bodyHandle = await page.$('body');
     const { width, height } = await bodyHandle.boundingBox();
